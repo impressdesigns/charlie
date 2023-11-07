@@ -1,4 +1,10 @@
 FROM eclipse-temurin:21-jdk-alpine@sha256:001dfe1c179b3f315bd6549ad1fe94fd7204984319bd3c0f3b385b5188cb18b8 as build
+
+ARG git_sha="development"
+ENV GIT_SHA=$git_sha
+ARG SENTRY_AUTH_TOKEN
+ENV SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN
+
 WORKDIR /scratch
 
 COPY mvnw .
