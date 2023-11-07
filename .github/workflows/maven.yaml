@@ -1,0 +1,34 @@
+name: "Java CI with Maven"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: "Set up JDK"
+        uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: "Install the JDBC driver"
+        run: mvn install:install-file -Dfile="vendored/fmjdbc.jar" -DgroupId="com.filemaker" -DartifactId="jdbc" -Dversion="18.0.1" -Dpackaging="jar" -DgeneratePom="true"
+
+      - name: "Build with Maven"
+        run: mvn -B package --file pom.xml
+
+      - name: "Update dependency graph"
+        uses: advanced-security/maven-dependency-submission-action@fcd7eab6b6d22946badc98d1e62665cdee93e0ae # v3.0.3
