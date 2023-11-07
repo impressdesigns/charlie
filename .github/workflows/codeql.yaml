@@ -1,0 +1,53 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '42 8 * * 6'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: 'ubuntu-latest'
+    timeout-minutes: 360
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'java-kotlin' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@bad341350a2f5616f9e048e51360cedc49181ce8 # codeql-bundle-v2.15.1
+      with:
+        languages: ${{ matrix.language }}
+
+    - name: "Set up JDK"
+      uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: "Install the JDBC driver"
+      run: mvn install:install-file -Dfile="vendored/fmjdbc.jar" -DgroupId="com.filemaker" -DartifactId="jdbc" -Dversion="18.0.1" -Dpackaging="jar" -DgeneratePom="true"
+
+    - name: "Build with Maven"
+      run: mvn -B package --file pom.xml
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@bad341350a2f5616f9e048e51360cedc49181ce8 # codeql-bundle-v2.15.1
+      with:
+        category: "/language:${{matrix.language}}"
