@@ -7,6 +7,7 @@ ENV SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN
 
 WORKDIR /scratch
 
+COPY .git .git
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
