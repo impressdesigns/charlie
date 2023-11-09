@@ -17,7 +17,6 @@ FROM eclipse-temurin:21-jre-alpine@sha256:2a4755c16fe3390e6a89daed9adfc6d9dc7be1
 ARG git_sha="development"
 ENV GIT_SHA=$git_sha
 ENV SENTRY_RELEASE=charlie@$git_sha
-RUN echo $SENTRY_RELEASE
 
 COPY --from=build /scratch/build/libs/charlie.jar .
 
