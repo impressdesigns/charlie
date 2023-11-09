@@ -40,6 +40,6 @@ tasks.withType<Test> {
 	useJUnitPlatform()
 }
 
-tasks.jar {
+tasks.withType<Jar> {
     archiveFileName.set("${project.name}.jar")
 }

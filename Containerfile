@@ -12,7 +12,7 @@ COPY build.gradle.kts settings.gradle.kts gradlew /scratch/
 COPY vendored/fmjdbc.jar .
 COPY src src
 
-RUN ./gradlew build
+RUN ./gradlew bootJar
 
 FROM eclipse-temurin:21-jre-alpine@sha256:2a4755c16fe3390e6a89daed9adfc6d9dc7be116dfce84497cf84f761b973311
 
