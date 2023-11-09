@@ -8,7 +8,7 @@ ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 WORKDIR /scratch
 
 COPY gradle gradle
-COPY build.gradle.kts settings.gradle.kts gradlew .
+COPY build.gradle.kts settings.gradle.kts gradlew /scratch/
 COPY vendored/fmjdbc.jar .
 COPY src src
 
