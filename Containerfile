@@ -16,6 +16,11 @@ RUN ./gradlew bootJar
 
 FROM eclipse-temurin:21-jre-alpine@sha256:2a4755c16fe3390e6a89daed9adfc6d9dc7be116dfce84497cf84f761b973311
 
+ARG git_sha="development"
+ENV GIT_SHA=$git_sha
+ENV SENTRY_RELEASE=charlie@$git_sha
+RUN echo $SENTRY_RELEASE
+
 COPY --from=build /scratch/build/libs/charlie.jar .
 
 # HTTP
