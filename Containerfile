@@ -9,7 +9,7 @@ WORKDIR /scratch
 
 COPY gradle gradle
 COPY build.gradle.kts settings.gradle.kts gradlew /scratch/
-COPY vendored/fmjdbc.jar .
+COPY vendored vendored
 COPY src src
 
 RUN ./gradlew bootJar
