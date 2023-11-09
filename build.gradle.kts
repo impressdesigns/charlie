@@ -9,7 +9,7 @@ plugins {
     id("io.sentry.jvm.gradle") version "3.14.0"
 }
 
-group = "com.example"
+group = "com.impressdesigns"
 version = "0.0.1-SNAPSHOT"
 
 java {
@@ -48,6 +48,6 @@ tasks.withType<Jar> {
 }
 
 sentry {
-    debug.set(true)
+    projectName.set("charlie")
     includeSourceContext.set(true)
 }
