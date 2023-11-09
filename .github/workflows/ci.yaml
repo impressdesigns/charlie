@@ -25,9 +25,8 @@ jobs:
           cache: gradle
 
       - name: "Build with Gradle"
-        run: ./gradlew build
+        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+        with:
+          arguments: build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
-      - name: "Update dependency graph"
-        uses: advanced-security/maven-dependency-submission-action@fcd7eab6b6d22946badc98d1e62665cdee93e0ae # v3.0.3
