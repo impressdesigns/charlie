@@ -48,6 +48,9 @@ tasks.withType<Jar> {
 }
 
 sentry {
+    debug.set(true)
+    authToken.set(System.getenv("SENTRY_AUTH_TOKEN"))
+    org.set("impressdesigns")
     projectName.set("charlie")
     includeSourceContext.set(true)
 }
