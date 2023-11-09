@@ -26,14 +26,14 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
 
-      - name: "Build with Gradle"
+      - name: "Gradle build"
         run: ./gradlew build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
         # "Make sure the `assemble` task is executed."
         # - https://docs.sentry.io/platforms/java/source-context/
-      - name: "Build with Gradle"
+      - name: "Gradle assemble"
         run: ./gradlew assemble
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
