@@ -7,20 +7,16 @@ ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 
 WORKDIR /scratch
 
-COPY .git .git
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
+COPY gradle gradle
+COPY build.gradle.kts settings.gradle.kts gradlew /scratch/
+COPY vendored vendored
 COPY src src
-COPY vendored/fmjdbc.jar .
 
-RUN ./mvnw install:install-file -Dfile="fmjdbc.jar" -DgroupId="com.filemaker" -DartifactId="jdbc" -Dversion="18.0.1" -Dpackaging="jar" -DgeneratePom="true"
-
-RUN ./mvnw install -DskipTests
+RUN ./gradlew bootJar
 
 FROM eclipse-temurin:21-jre-alpine@sha256:2a4755c16fe3390e6a89daed9adfc6d9dc7be116dfce84497cf84f761b973311
 
-COPY --from=build /scratch/target/charlie.jar .
+COPY --from=build /scratch/build/libs/charlie.jar .
 
 # HTTP
 EXPOSE 8080

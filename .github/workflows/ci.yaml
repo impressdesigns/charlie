@@ -1,4 +1,4 @@
-name: "Java CI with Maven"
+name: "Java CI with Gradle"
 
 on:
   push:
@@ -22,15 +22,10 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: maven
 
-      - name: "Install the JDBC driver"
-        run: mvn install:install-file -Dfile="vendored/fmjdbc.jar" -DgroupId="com.filemaker" -DartifactId="jdbc" -Dversion="18.0.1" -Dpackaging="jar" -DgeneratePom="true"
-
-      - name: "Build with Maven"
-        run: mvn -B package --file pom.xml
+      - name: "Build with Gradle"
+        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+        with:
+          arguments: build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
-      - name: "Update dependency graph"
-        uses: advanced-security/maven-dependency-submission-action@fcd7eab6b6d22946badc98d1e62665cdee93e0ae # v3.0.3

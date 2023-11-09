@@ -1,9 +1,10 @@
-name: "GitHub Pages - Javadoc and Maven site"
+name: "GitHub Pages - Dokka"
 
 on:
   push:
     branches:
       - main
+  pull_request:
 
 jobs:
   build:
@@ -18,18 +19,18 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: maven
 
-      - name: "Install the JDBC driver"
-        run: mvn install:install-file -Dfile="vendored/fmjdbc.jar" -DgroupId="com.filemaker" -DartifactId="jdbc" -Dversion="18.0.1" -Dpackaging="jar" -DgeneratePom="true"
-
-      - name: "Maven Dokka"
-        run: mvn -B dokka:dokka --file pom.xml
+      - name: "Generate documentation"
+        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+        with:
+          arguments: dokkaHtml
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: "Upload artifact"
         uses: actions/upload-pages-artifact@a753861a5debcf57bf8b404356158c8e1e33150c # v2.0.0
         with:
-          path: ./target/dokka
+          path: ./build/dokka/html
 
   deploy:
     if: ${{ github.ref == 'refs/heads/main' }}
