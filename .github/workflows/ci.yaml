@@ -28,6 +28,8 @@ jobs:
 
       - name: "Build with Gradle"
         run: ./gradlew build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
         # "Make sure the `assemble` task is executed."
         # - https://docs.sentry.io/platforms/java/source-context/
