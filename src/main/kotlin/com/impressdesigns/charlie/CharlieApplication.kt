@@ -7,5 +7,11 @@ import org.springframework.boot.runApplication
 class CharlieApplication
 
 fun main(args: Array<String>) {
+    System.getenv("CHARLIE_JDBC_URI")
+        ?: throw IllegalArgumentException("JDBC URI is required, please set CHARLIE_JDBC_URI")
+    System.getenv("CHARLIE_JDBC_USERNAME")
+        ?: throw IllegalArgumentException("Username is required, please set CHARLIE_JDBC_USERNAME")
+    System.getenv("CHARLIE_JDBC_PASSWORD")
+        ?: throw IllegalArgumentException("Password URI is required, please set CHARLIE_JDBC_PASSWORD")
     runApplication<CharlieApplication>(*args)
 }
