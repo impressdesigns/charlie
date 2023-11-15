@@ -5,17 +5,17 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 
-data class BadgeLine(val orderNumber: Int, val designNumber: Int, val quantity: Int, val instructions: String)
+data class ProductionLine(val orderNumber: Int, val designNumber: Int, val quantity: Int, val instructions: String)
 
 @RestController
 @RequestMapping(path = ["search"])
 class SearchController {
-    @GetMapping("/badge-lines")
-    fun badgeLines() = getBadgeLines()
+    @GetMapping("/open-digital-production-lines")
+    fun openDigitalProductionLines() = getOpenDigitalProductionLines()
 }
 
 
-fun getBadgeLines(): List<BadgeLine> {
+fun getOpenDigitalProductionLines(): List<ProductionLine> {
     connect().use {
         val queryText = """
             SELECT Orders.ID_Order             AS order_id,
@@ -31,13 +31,13 @@ fun getBadgeLines(): List<BadgeLine> {
     """.trimIndent()
         val query = it.prepareStatement(queryText)
         val result = query.executeQuery()
-        val lines = mutableListOf<BadgeLine>()
+        val lines = mutableListOf<ProductionLine>()
         while (result.next()) {
             val orderId = result.getInt("order_id")
             val designId = result.getInt("design_id")
             val quantity = result.getInt("quantity")
             val instructions = result.getString("instructions")
-            lines.add(BadgeLine(orderId, designId, quantity, instructions))
+            lines.add(ProductionLine(orderId, designId, quantity, instructions))
         }
         return lines
     }
