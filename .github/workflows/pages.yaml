@@ -20,10 +20,11 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: "Generate documentation"
+      - name: Setup Gradle
         uses: gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a # v2.9.0
-        with:
-          arguments: dokkaHtml
+
+      - name: "Generate documentation"
+        run: ./gradlew dokkaHtml
 
       - name: "Upload artifact"
         uses: actions/upload-pages-artifact@a753861a5debcf57bf8b404356158c8e1e33150c # v2.0.0
