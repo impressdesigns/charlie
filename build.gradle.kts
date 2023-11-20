@@ -7,6 +7,7 @@ plugins {
     kotlin("plugin.spring") version "1.9.20"
     id("org.jetbrains.dokka") version "1.9.10"
     id("io.sentry.jvm.gradle") version "3.14.0"
+    id("org.jetbrains.kotlinx.kover") version "0.7.4"
 }
 
 group = "com.impressdesigns"
