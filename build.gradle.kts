@@ -54,11 +54,3 @@ sentry {
     projectName.set("charlie")
     includeSourceContext.set(true)
 }
-
-koverReport {
-    defaults {
-        xml {
-            onCheck = true
-        }
-    }
-}
