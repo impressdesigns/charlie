@@ -6,12 +6,16 @@ import org.springframework.web.bind.annotation.RestController
 
 
 data class ProductionLine(val orderNumber: Int, val designNumber: Int, val quantity: Int, val instructions: String)
+data class Order(val dateCreated: String, val orderNumber: Int, val customerNumber: Int)
 
 @RestController
 @RequestMapping(path = ["search"])
 class SearchController {
-    @GetMapping("/open-digital-production-lines")
+    @GetMapping("/open-digital-production-lines/")
     fun openDigitalProductionLines() = getOpenDigitalProductionLines()
+
+    @GetMapping("/open-orders/")
+    fun openOrders() = getOpenOrders()
 }
 
 
@@ -40,5 +44,27 @@ fun getOpenDigitalProductionLines(): List<ProductionLine> {
             lines.add(ProductionLine(orderId, designId, quantity, instructions))
         }
         return lines
+    }
+}
+
+fun getOpenOrders(): List<Order> {
+    connect().use {
+        val queryText = """
+            SELECT Orders.date_Creation AS date_created,
+                   Orders.ID_Order AS order_id,
+                    Orders.id_Customer AS customer_id
+            FROM Orders
+            WHERE Orders.cn_Display_Status_08 = 0
+    """.trimIndent()
+        val query = it.prepareStatement(queryText)
+        val result = query.executeQuery()
+        val orders = mutableListOf<Order>()
+        while (result.next()) {
+            val dateCreated = result.getString("date_created")
+            val orderId = result.getInt("order_id")
+            val customerId = result.getInt("customer_id")
+            orders.add(Order(dateCreated, orderId, customerId))
+        }
+        return orders
     }
 }
