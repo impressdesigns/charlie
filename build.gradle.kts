@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "com.impressdesigns"
-version = "0.5.0"
+version = "1.0.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
