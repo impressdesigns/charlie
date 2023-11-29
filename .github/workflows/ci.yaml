@@ -11,7 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write
+      # Qodana adding checks
+      checks: write
+      pull-requests: write
+      # Qodana uploading SARIF
+      security-events: write
 
     steps:
       - name: "Checkout repository"
