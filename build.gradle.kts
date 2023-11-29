@@ -42,6 +42,7 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy(tasks.koverVerify)
 }
 
 tasks.withType<Jar> {
