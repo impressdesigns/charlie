@@ -38,6 +38,11 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
+      - name: "Gradle test"
+        run: ./gradlew test
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
       - name: "Generate Kover report"
         run: ./gradlew koverXmlReport
 
@@ -45,3 +50,26 @@ jobs:
         uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: "Create coverage-data directory and copy contents"
+        run: |
+          mkdir -p .qodana/code-coverage
+          cp -R build/kover/bin-reports/* .qodana/code-coverage/
+
+      - name: "Upload coverage data"
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        with:
+          name: gradle-coverage-data.zip
+          path: .qodana/code-coverage
+
+      - name: "Qodana Scan"
+        uses: JetBrains/qodana-action@95ecb19ba27e308153723e54a790e4ad908b13a0 # v2023.2.8
+        with:
+          pr-mode: false
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+
+      - name: "Upload Qodana SARIF to CodeQL"
+        uses: github/codeql-action/upload-sarif@4b6aa0b07da05d6e43d0e5f9c8596a6532ce1c85 # codeql-bundle-v2.15.3
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
