@@ -21,7 +21,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@87a9a15658c426a54dd469d4fc7dc1a73ca9d4a6 # v2.10.0
+        uses: gradle/gradle-build-action@8cbcb9948b5892387aed077daf6f90e1f0ba5b27 # v2.11.0
 
       - name: "Generate documentation"
         run: ./gradlew dokkaHtml
@@ -50,4 +50,4 @@ jobs:
     steps:
       - name: "Deploy to GitHub Pages"
         id: deployment
-        uses: actions/deploy-pages@9dbe3824824f8a1377b8e298bafde1a50ede43e5 # v2.0.4
+        uses: actions/deploy-pages@13b55b33dd8996121833dbc1db458c793a334630 # v3.0.1
