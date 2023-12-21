@@ -1,11 +1,11 @@
 package com.impressdesigns.charlie
 
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 
-data class ProductionLine(val orderNumber: Int, val designNumber: Int, val quantity: Int, val instructions: String)
 data class Order(
     val orderNumber: Int,
     val customer: String,
@@ -28,6 +28,10 @@ data class Order(
     val statusPaid: Double,
 )
 
+data class ProductionLine(val orderNumber: Int, val designNumber: Int, val quantity: Int, val instructions: String)
+data class Design(val designNumber: Int)
+
+
 @RestController
 @RequestMapping(path = ["search"])
 class SearchController {
@@ -36,6 +40,9 @@ class SearchController {
 
     @GetMapping("/open-orders/")
     fun openOrders() = getOpenOrders()
+
+    @GetMapping("/designs-on-po/{po}/")
+    fun designsOnPo(@PathVariable po: String) = getDesignsOnPo(po)
 }
 
 
@@ -132,5 +139,24 @@ fun getOpenOrders(): List<Order> {
             )
         }
         return orders
+    }
+}
+
+fun getDesignsOnPo(po: String): List<Design> {
+    connect().use {
+        val queryText = """
+            SELECT OrderDes.id_Design AS design_number
+            FROM OrderDes
+            JOIN Orders ON Orders.ID_Order = OrderDes.id_Order
+            WHERE Orders.CustomerPurchaseOrder = ?
+    """.trimIndent()
+        val query = it.prepareStatement(queryText)
+        query.setString(1, po)
+        val result = query.executeQuery()
+        val designs = mutableListOf<Design>()
+        while (result.next()) {
+            designs.add(Design(result.getInt("design_number")))
+        }
+        return designs
     }
 }
