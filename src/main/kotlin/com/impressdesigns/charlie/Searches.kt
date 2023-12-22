@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestController
 
 data class Order(
     val orderNumber: Int,
+    val customerPo: String,
     val customer: String,
+    val customerRep: String,
     val createdBy: String,
     val orderType: Double,
     val onHoldText: String,
@@ -81,7 +83,9 @@ fun getOpenOrders(): List<Order> {
             SELECT
                 -- Summary
                 Orders.ID_Order                                AS order_id,
+                Orders.CustomerPurchaseOrder                   AS customer_po,
                 Cust.CompanyName                               AS customer,
+                Cust.CustomerServiceRep                        AS customer_rep,
                 Emp.ct_NameFull                                AS created_by,
                 Orders.id_OrderType                            AS order_type_id,
                 Orders.HoldOrderText                           AS on_hold_text,
@@ -119,7 +123,9 @@ fun getOpenOrders(): List<Order> {
             orders.add(
                 Order(
                     result.getInt("order_id"),
+                    result.getString("customer_po") ?: "",
                     result.getString("customer"),
+                    result.getString("customer_rep") ?: "",
                     result.getString("created_by"),
                     result.getDouble("order_type_id"),
                     result.getString("on_hold_text"),
