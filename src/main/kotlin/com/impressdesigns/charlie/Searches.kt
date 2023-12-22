@@ -23,6 +23,7 @@ data class Order(
     val statusPurchasedSub: Double,
     val statusReceived: Double,
     val statusReceivedSub: Double,
+    val statusProduced: Double,
     val statusShipped: Double,
     val statusInvoiced: Double,
     val statusPaid: Double,
@@ -101,6 +102,7 @@ fun getOpenOrders(): List<Order> {
                 Orders.sts_PurchasedSub                        AS status_purchased_sub,
                 Orders.sts_Received                            AS status_received,
                 Orders.sts_ReceivedSub                         AS status_received_sub,
+                Orders.sts_Produced                            AS status_produced, 
                 Orders.sts_Shipped                             AS status_shipped,
                 Orders.sts_Invoiced                            AS status_invoiced,
                 Orders.sts_Paid                                AS status_paid
@@ -132,6 +134,7 @@ fun getOpenOrders(): List<Order> {
                     result.getDouble("status_purchased_sub"),
                     result.getDouble("status_received"),
                     result.getDouble("status_received_sub"),
+                    result.getDouble("status_produced"),
                     result.getDouble("status_shipped"),
                     result.getDouble("status_invoiced"),
                     result.getDouble("status_paid"),
