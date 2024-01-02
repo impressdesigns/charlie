@@ -29,6 +29,28 @@ data class Order(
     val statusShipped: Double,
     val statusInvoiced: Double,
     val statusPaid: Double,
+    val notesOnOrder: String,
+    val notesOnHold: String,
+    val notesOnArt: String,
+    val notesOnPurchasing: String,
+    val notesOnPurchasingSub: String,
+    val notesOnReceiving: String,
+    val notesOnProduction: String,
+    val notesOnShipping: String,
+    val notesOnAccounting: String,
+    val notesToArt: String,
+    val notesToPurchasing: String,
+    val notesToPurchasingSub: String,
+    val notesToReceiving: String,
+    val notesToProduction: String,
+    val notesToFinishing: String,
+    val notesToShipping: String,
+    val notesToAccounting: String,
+    val notesFormsOrderApproval: String,
+    val notesFormsInvoice: String,
+    val notesFormsPackingList: String,
+    val notesToWebCustomer: String,
+    val notesToWebSalesperson: String,
 )
 
 data class ProductionLine(val orderNumber: Int, val designNumber: Int, val quantity: Int, val instructions: String)
@@ -106,10 +128,40 @@ fun getOpenOrders(): List<Order> {
                 Orders.sts_PurchasedSub                        AS status_purchased_sub,
                 Orders.sts_Received                            AS status_received,
                 Orders.sts_ReceivedSub                         AS status_received_sub,
-                Orders.sts_Produced                            AS status_produced, 
+                Orders.sts_Produced                            AS status_produced,
                 Orders.sts_Shipped                             AS status_shipped,
                 Orders.sts_Invoiced                            AS status_invoiced,
-                Orders.sts_Paid                                AS status_paid
+                Orders.sts_Paid                                AS status_paid,
+            
+                -- Notes "on"
+                Orders.NotesOnOrder                            AS notes_on_order,
+                Orders.NotesOnHold                             AS notes_on_hold,
+                Orders.NotesOnArt                              AS notes_on_art,
+                Orders.NotesOnPurchasing                       AS notes_on_purchasing,
+                Orders.NotesOnPurchasingSub                    AS notes_on_purchasing_sub,
+                Orders.NotesOnReceiving                        AS notes_on_receiving,
+                Orders.NotesOnProduction                       AS notes_on_production,
+                Orders.NotesOnShipping                         AS notes_on_shipping,
+                Orders.NotesOnAccounting                       AS notes_on_accounting,
+            
+                -- Notes "to"
+                Orders.NotesToArt                              AS notes_to_art,
+                Orders.NotesToPurchasing                       AS notes_to_purchasing,
+                Orders.NotesToPurchasingSub                    AS notes_to_purchasing_sub,
+                Orders.NotesToReceiving                        AS notes_to_receiving,
+                Orders.NotesToProduction                       AS notes_to_production,
+                Orders.NotesToFinishing                        AS notes_to_finishing,
+                Orders.NotesToShipping                         AS notes_to_shipping,
+                Orders.NotesToAccounting                       AS notes_to_accounting,
+            
+                -- Notes "forms"
+                Orders.NotesFormsOrderApproval                 AS notes_forms_order_approval,
+                Orders.NotesFormsInvoice                       AS notes_forms_invoice,
+                Orders.NotesFormsPackingList                   AS notes_forms_packing_list,
+            
+                -- Notes "web"
+                Orders.NotesToWebCustomer                      AS notes_to_web_customer,
+                Orders.NotesToWebSalesperson                   AS notes_to_web_salesperson
             FROM Orders
                      JOIN Cust ON Cust.ID_Customer = Orders.id_Customer
                      JOIN Emp ON Orders.id_EmpCreatedBy = Emp.ID_Employee
@@ -144,6 +196,28 @@ fun getOpenOrders(): List<Order> {
                     result.getDouble("status_shipped"),
                     result.getDouble("status_invoiced"),
                     result.getDouble("status_paid"),
+                    result.getString("notes_on_order") ?: "",
+                    result.getString("notes_on_hold") ?: "",
+                    result.getString("notes_on_art") ?: "",
+                    result.getString("notes_on_purchasing") ?: "",
+                    result.getString("notes_on_purchasing_sub") ?: "",
+                    result.getString("notes_on_receiving") ?: "",
+                    result.getString("notes_on_production") ?: "",
+                    result.getString("notes_on_shipping") ?: "",
+                    result.getString("notes_on_accounting") ?: "",
+                    result.getString("notes_to_art") ?: "",
+                    result.getString("notes_to_purchasing") ?: "",
+                    result.getString("notes_to_purchasing_sub") ?: "",
+                    result.getString("notes_to_receiving") ?: "",
+                    result.getString("notes_to_production") ?: "",
+                    result.getString("notes_to_finishing") ?: "",
+                    result.getString("notes_to_shipping") ?: "",
+                    result.getString("notes_to_accounting") ?: "",
+                    result.getString("notes_forms_order_approval") ?: "",
+                    result.getString("notes_forms_invoice") ?: "",
+                    result.getString("notes_forms_packing_list") ?: "",
+                    result.getString("notes_to_web_customer") ?: "",
+                    result.getString("notes_to_web_salesperson") ?: "",
                 )
             )
         }
