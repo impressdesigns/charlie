@@ -24,7 +24,7 @@ jobs:
           java-version: '21'
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2 # v2.11.1
+        uses: gradle/gradle-build-action@a8f75513eafdebd8141bd1cd4e30fcd194af8dfa # v2.12.0
 
       - name: "Gradle build"
         run: ./gradlew build
@@ -42,6 +42,6 @@ jobs:
         run: ./gradlew koverXmlReport
 
       - name: "Upload coverage reports to Codecov"
-        uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
+        uses: codecov/codecov-action@4fe8c5f003fae66aa5ebb77cfd3e7bfbbda0b6b0 # v3.1.5
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
