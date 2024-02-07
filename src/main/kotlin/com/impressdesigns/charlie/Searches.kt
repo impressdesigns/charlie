@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RestController
 data class Order(
     val orderNumber: Int,
     val customerPo: String,
-    val customer: String,
+    val customerID: Int,
     val customerRep: String,
-    val createdBy: String,
-    val orderType: Double,
+    val createdByID: Int,
+    val orderTypeID: Double,
     val onHoldText: String,
     val productQuantity: Int,
     val decorationQuantity: Int,
@@ -106,9 +106,9 @@ fun getOpenOrders(): List<Order> {
                 -- Summary
                 Orders.ID_Order                                AS order_id,
                 Orders.CustomerPurchaseOrder                   AS customer_po,
-                Cust.CompanyName                               AS customer,
+                Orders.id_Customer                             AS customer_id,
                 Cust.CustomerServiceRep                        AS customer_rep,
-                Emp.ct_NameFull                                AS created_by,
+                Orders.id_EmpCreatedBy                         AS created_by_id,
                 Orders.id_OrderType                            AS order_type_id,
                 Orders.HoldOrderText                           AS on_hold_text,
             
@@ -164,7 +164,6 @@ fun getOpenOrders(): List<Order> {
                 Orders.NotesToWebSalesperson                   AS notes_to_web_salesperson
             FROM Orders
                      JOIN Cust ON Cust.ID_Customer = Orders.id_Customer
-                     JOIN Emp ON Orders.id_EmpCreatedBy = Emp.ID_Employee
             WHERE Orders.cn_Display_Status_08 = 0
             ORDER BY Orders.date_OrderRequestedToShip
     """.trimIndent()
@@ -176,9 +175,9 @@ fun getOpenOrders(): List<Order> {
                 Order(
                     result.getInt("order_id"),
                     result.getString("customer_po") ?: "",
-                    result.getString("customer"),
+                    result.getInt("customer_id"),
                     result.getString("customer_rep") ?: "",
-                    result.getString("created_by"),
+                    result.getInt("created_by_id"),
                     result.getDouble("order_type_id"),
                     result.getString("on_hold_text"),
                     result.getInt("product_quantity"),
