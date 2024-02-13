@@ -82,7 +82,7 @@ fun getOpenDigitalProductionLines(): List<ProductionLine> {
             FROM Orders
                      JOIN OrderDes ON Orders.ID_Order = OrderDes.id_Order
                      JOIN LinesOE ON Orders.ID_Order = LinesOE.id_Order
-            WHERE Orders.cn_Display_Status_06 IN (0, 0.5)
+            WHERE Orders.sts_Produced IN (0, 0.5)
               AND Orders.id_OrderType = 63
               AND LinesOE.OrderInstructions IS NOT NULL 
     """.trimIndent()
