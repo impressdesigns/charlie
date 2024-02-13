@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.sql.Date
 
 
 data class Order(
@@ -16,10 +17,10 @@ data class Order(
     val onHoldText: String,
     val productQuantity: Int,
     val decorationQuantity: Int,
-    val dateCreated: String,
-    val datePlaced: String,
-    val dateApproximateShip: String,
-    val dateInHands: String,
+    val dateCreated: Date?,
+    val datePlaced: Date?,
+    val dateApproximateShip: Date?,
+    val dateInHands: Date?,
     val statusArt: Double,
     val statusPurchased: Double,
     val statusPurchasedSub: Double,
@@ -110,17 +111,17 @@ fun getOpenOrders(): List<Order> {
                 Cust.CustomerServiceRep                        AS customer_rep,
                 Orders.id_EmpCreatedBy                         AS created_by_id,
                 Orders.id_OrderType                            AS order_type_id,
-                Orders.HoldOrderText                           AS on_hold_text,
+                UPPER(Orders.HoldOrderText)                    AS on_hold_text,
             
                 -- Quantities
                 Orders.cn_TotalProductQty_ToProduce            AS product_quantity,
                 Orders.cn_TotalProductQty_Imprints             AS decoration_quantity,
             
                 -- Dates
-                COALESCE(Orders.date_Creation, '')             AS date_created,
-                COALESCE(Orders.date_OrderPlaced, '')          AS date_placed,
-                COALESCE(Orders.date_OrderRequestedToShip, '') AS date_approximate_ship,
-                COALESCE(Orders.date_OrderDropDead, '')        AS date_in_hands,
+                Orders.date_Creation                           AS date_created,
+                Orders.date_OrderPlaced                        AS date_placed,
+                Orders.date_OrderRequestedToShip               AS date_approximate_ship,
+                Orders.date_OrderDropDead                      AS date_in_hands,
             
                 -- Statuses
                 Orders.sts_ArtDone                             AS status_art,
@@ -164,7 +165,7 @@ fun getOpenOrders(): List<Order> {
                 Orders.NotesToWebSalesperson                   AS notes_to_web_salesperson
             FROM Orders
                      JOIN Cust ON Cust.ID_Customer = Orders.id_Customer
-            WHERE Orders.cn_Display_Status_08 = 0
+            WHERE Orders.sts_Invoiced = 0
             ORDER BY Orders.date_OrderRequestedToShip
     """.trimIndent()
         val query = it.prepareStatement(queryText)
@@ -182,10 +183,10 @@ fun getOpenOrders(): List<Order> {
                     result.getString("on_hold_text"),
                     result.getInt("product_quantity"),
                     result.getInt("decoration_quantity"),
-                    result.getString("date_created") ?: "",
-                    result.getString("date_placed") ?: "",
-                    result.getString("date_approximate_ship") ?: "",
-                    result.getString("date_in_hands") ?: "",
+                    result.getDate("date_created"),
+                    result.getDate("date_placed"),
+                    result.getDate("date_approximate_ship"),
+                    result.getDate("date_in_hands"),
                     result.getDouble("status_art"),
                     result.getDouble("status_purchased"),
                     result.getDouble("status_purchased_sub"),
