@@ -64,8 +64,8 @@ class SearchController {
     @GetMapping("/open-digital-production-lines/")
     fun openDigitalProductionLines() = getOpenDigitalProductionLines()
 
-    @GetMapping("/open-orders/")
-    fun openOrders() = getOpenOrders()
+    @GetMapping("/orders-updated-today/")
+    fun ordersUpdatedToday() = getOrdersUpdatedToday()
 
     @GetMapping("/designs-on-po/{po}/")
     fun designsOnPo(@PathVariable po: String) = getDesignsOnPo(po)
@@ -100,7 +100,7 @@ fun getOpenDigitalProductionLines(): List<ProductionLine> {
     }
 }
 
-fun getOpenOrders(): List<Order> {
+fun getOrdersUpdatedToday(): List<Order> {
     connect().use {
         val queryText = """
             SELECT
@@ -165,10 +165,11 @@ fun getOpenOrders(): List<Order> {
                 Orders.NotesToWebSalesperson                   AS notes_to_web_salesperson
             FROM Orders
                      JOIN Cust ON Cust.ID_Customer = Orders.id_Customer
-            WHERE Orders.sts_Invoiced = 0
+            WHERE Orders.date_Modification =  ?
             ORDER BY Orders.date_OrderRequestedToShip
     """.trimIndent()
         val query = it.prepareStatement(queryText)
+        query.setDate(1, Date(java.util.Date().time))
         val result = query.executeQuery()
         val orders = mutableListOf<Order>()
         while (result.next()) {
