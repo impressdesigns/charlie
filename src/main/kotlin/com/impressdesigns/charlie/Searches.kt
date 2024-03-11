@@ -55,7 +55,7 @@ data class Order(
 )
 
 data class ProductionLine(val orderNumber: Int, val designNumber: Int, val quantity: Int, val instructions: String)
-data class Design(val designNumber: Int)
+data class DesignNumber(val designNumber: Int)
 
 
 @RestController
@@ -226,7 +226,7 @@ fun getOrdersUpdatedToday(): List<Order> {
     }
 }
 
-fun getDesignsOnPo(po: String): List<Design> {
+fun getDesignsOnPo(po: String): List<DesignNumber> {
     connect().use {
         val queryText = """
             SELECT OrderDes.id_Design AS design_number
@@ -237,9 +237,9 @@ fun getDesignsOnPo(po: String): List<Design> {
         val query = it.prepareStatement(queryText)
         query.setString(1, po)
         val result = query.executeQuery()
-        val designs = mutableListOf<Design>()
+        val designs = mutableListOf<DesignNumber>()
         while (result.next()) {
-            designs.add(Design(result.getInt("design_number")))
+            designs.add(DesignNumber(result.getInt("design_number")))
         }
         return designs
     }
