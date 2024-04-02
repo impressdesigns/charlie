@@ -80,14 +80,11 @@ fun getOpenDigitalProductionLines(): List<ProductionLine> {
                    LinesOE.cn_LineQuantity_Req AS quantity,
                    LinesOE.OrderInstructions   AS instructions
             FROM Orders
-                     JOIN OrdDesLoc ON Orders.ID_Order = OrdDesLoc.ID_Order
-                     JOIN OrderDes ON OrderDes.ID_OrderDesign = OrdDesLoc.id_OrderDesign
-                     JOIN LinesCompletion ON OrdDesLoc.ID_OrderDesLoc = LinesCompletion.id_OrderDesLoc
-                     JOIN LinesOE ON LinesCompletion.id_LineOE = LinesOE.ID_LineOE
+                     JOIN OrderDes ON Orders.ID_Order = OrderDes.id_Order
+                     JOIN LinesOE ON Orders.ID_Order = LinesOE.id_Order
             WHERE Orders.sts_Produced IN (0, 0.5)
               AND Orders.id_OrderType = 63
-              AND LinesOE.OrderInstructions IS NOT NULL
-              AND LinesCompletion.sts_ApplyLocation = 1 
+              AND LinesOE.OrderInstructions IS NOT NULL 
     """.trimIndent()
         val query = it.prepareStatement(queryText)
         val result = query.executeQuery()
