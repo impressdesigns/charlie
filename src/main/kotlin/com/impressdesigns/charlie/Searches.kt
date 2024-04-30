@@ -165,7 +165,7 @@ fun getOrdersUpdatedToday(): List<Order> {
                 Orders.NotesToWebSalesperson                   AS notes_to_web_salesperson
             FROM Orders
                      JOIN Cust ON Cust.ID_Customer = Orders.id_Customer
-            WHERE Orders.date_Modification =  ?
+            WHERE Orders.date_Modification = ? OR Orders.sts_Invoiced = 0
             ORDER BY Orders.date_OrderRequestedToShip
     """.trimIndent()
         val query = it.prepareStatement(queryText)
