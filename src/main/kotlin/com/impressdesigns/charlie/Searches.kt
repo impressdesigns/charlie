@@ -55,6 +55,7 @@ data class Order(
 )
 
 data class ProductionLine(val orderNumber: Int, val designNumber: Int, val quantity: Int, val instructions: String)
+data class Design(val designNumber: Float, val title: String)
 data class DesignNumber(val designNumber: Int)
 
 
@@ -66,6 +67,9 @@ class SearchController {
 
     @GetMapping("/orders-updated-today/")
     fun ordersUpdatedToday() = getOrdersUpdatedToday()
+
+    @GetMapping("/designs-updated-today/")
+    fun designsUpdatedToday() = getDesignsUpdatedToday()
 
     @GetMapping("/designs-on-po/{po}/")
     fun designsOnPo(@PathVariable po: String) = getDesignsOnPo(po)
@@ -223,6 +227,28 @@ fun getOrdersUpdatedToday(): List<Order> {
             )
         }
         return orders
+    }
+}
+
+fun getDesignsUpdatedToday(): List<Design> {
+    connect().use {
+        val queryText = """
+            SELECT 
+                ID_Design AS id,
+                DesignName AS title
+            FROM Des
+            WHERE Des.date_Modification = ?
+    """.trimIndent()
+        val query = it.prepareStatement(queryText)
+        query.setDate(1, Date(java.util.Date().time))
+        val result = query.executeQuery()
+        val designs = mutableListOf<Design>()
+        while (result.next()) {
+            val id = result.getFloat("id")
+            val title = result.getString("title") ?: ""
+            designs.add(Design(id, title))
+        }
+        return designs
     }
 }
 
