@@ -6,29 +6,61 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.sql.Date
 
+@RestController
+@RequestMapping(path = ["orders"])
+class OrdersController {
+    @GetMapping("/{orderNumber}/")
+    fun order(@PathVariable orderNumber: Int) = getOrder(orderNumber)
+}
+
+data class LineItem(
+    val id: Int,
+    val partNumber: String,
+    val partDescription: String,
+    val quantity: Int,
+    val bomParentLine: Int,
+    val instructions: String?,
+)
+
+data class OrderProductionLine(
+    val id: Int,
+    val lineItemId: Int,
+    val applyLocation: Boolean,
+    val quantity: Int,
+    val designId: Int,
+    val designLocation: String,
+)
+
+data class OrderEvent(
+    val id: Int,
+    val typeId: Int,
+    val machineId: Int,
+    val scheduled: Date?,
+)
+
 data class Notes(
-    val onOrder: String,
-    val onHold: String,
-    val onArt: String,
-    val onPurchasing: String,
-    val onPurchasingSub: String,
-    val onReceiving: String,
-    val onProduction: String,
-    val onShipping: String,
-    val onAccounting: String,
-    val toArt: String,
-    val toPurchasing: String,
-    val toPurchasingSub: String,
-    val toReceiving: String,
-    val toProduction: String,
-    val toFinishing: String,
-    val toShipping: String,
-    val toAccounting: String,
-    val notesFormsOrderApproval: String,
-    val notesFormsInvoice: String,
-    val notesFormsPackingList: String,
-    val toWebCustomer: String,
-    val toWebSalesperson: String,
+    val onOrder: String?,
+    val onHold: String?,
+    val onArt: String?,
+    val onPurchasing: String?,
+    val onPurchasingSub: String?,
+    val onReceiving: String?,
+    val onProduction: String?,
+    val onShipping: String?,
+    val onAccounting: String?,
+    val toArt: String?,
+    val toPurchasing: String?,
+    val toPurchasingSub: String?,
+    val toReceiving: String?,
+    val toProduction: String?,
+    val toFinishing: String?,
+    val toShipping: String?,
+    val toAccounting: String?,
+    val notesFormsOrderApproval: String?,
+    val notesFormsInvoice: String?,
+    val notesFormsPackingList: String?,
+    val toWebCustomer: String?,
+    val toWebSalesperson: String?,
 )
 
 data class Statuses(
@@ -59,14 +91,105 @@ data class Order(
     val dateInHands: Date?,
     val statuses: Statuses,
     val notes: Notes,
+    val lineItems: List<LineItem>,
+    val productionLines: List<OrderProductionLine>,
+    val events: List<OrderEvent>,
 )
 
 
-@RestController
-@RequestMapping(path = ["orders"])
-class OrdersController {
-    @GetMapping("/{orderNumber}/")
-    fun order(@PathVariable orderNumber: Int) = getOrder(orderNumber)
+fun getOrderLineItems(orderNumber: Int): List<LineItem> {
+    connect().use {
+        val queryText = """
+            SELECT LinesOE.ID_LineOE            AS lines_oe_id,
+                   LinesOE.PartNumber           AS part_number,
+                   LinesOE.PartDescription      AS part_description,
+                   LinesOE.cn_LineQuantity_Req  AS quantity_requested,
+                   LinesOE.id_LineOE_AssbParent AS assembly_parent_line_id, -- 0 if not used
+                   LinesOE.OrderInstructions    AS instructions
+            FROM LinesOE
+            WHERE LinesOE.id_Order = ?
+    """.trimIndent()
+        val query = it.prepareStatement(queryText)
+        query.setInt(1, orderNumber)
+        val result = query.executeQuery()
+        val lines = mutableListOf<LineItem>()
+        while (result.next()) {
+            lines.add(
+                LineItem(
+                    result.getInt("lines_oe_id"),
+                    result.getString("part_number"),
+                    result.getString("part_description"),
+                    result.getInt("quantity_requested"),
+                    result.getInt("assembly_parent_line_id"),
+                    result.getString("instructions"),
+                )
+            )
+        }
+        return lines
+    }
+}
+
+fun getOrderProductionLines(orderNumber: Int): List<OrderProductionLine> {
+    connect().use {
+        val queryText = """
+            SELECT LinesCompletion.ID_LineComp         AS lines_completion_id,
+                   LinesCompletion.id_LineOE           AS lines_oe_id,
+                   LinesCompletion.sts_ApplyLocation   AS apply_location,
+                   LinesCompletion.cn_Size01_ToProduce AS quantity_to_produce,
+                   OrderDes.id_Design                  AS design_id,
+                   OrdDesLoc.Location                  AS design_location
+            FROM LinesCompletion
+                     JOIN OrderDes ON LinesCompletion.id_OrderDesign = OrderDes.ID_OrderDesign
+                     JOIN OrdDesLoc ON LinesCompletion.id_OrderDesLoc = OrdDesLoc.id_OrderDesLoc
+            WHERE LinesCompletion.id_Order = ?
+    """.trimIndent()
+        val query = it.prepareStatement(queryText)
+        query.setInt(1, orderNumber)
+        val result = query.executeQuery()
+        val lines = mutableListOf<OrderProductionLine>()
+        while (result.next()) {
+            lines.add(
+                OrderProductionLine(
+                    result.getInt("lines_completion_id"),
+                    result.getInt("lines_oe_id"),
+                    result.getInt("apply_location") == 1,
+                    result.getInt("quantity_to_produce"),
+                    result.getInt("design_id"),
+                    result.getString("design_location"),
+                )
+            )
+        }
+        return lines
+    }
+}
+
+
+fun getOrderEvents(orderNumber: Int): List<OrderEvent> {
+    connect().use {
+        val queryText = """
+            SELECT Event.ID_Event           AS event_id,
+                   Event.id_ProductionEvent AS event_type_id,
+                   Event.id_Machine         AS machine_id,
+                   Event.date_Scheduled     AS date_scheduled
+            FROM Event
+            WHERE Event.id_Order = ?
+    """.trimIndent()
+        val query = it.prepareStatement(queryText)
+        query.setInt(1, orderNumber)
+        val result = query.executeQuery()
+        val events = mutableListOf<OrderEvent>()
+        while (result.next()) {
+            events.add(
+                OrderEvent(
+                    result.getInt("event_id"),
+                    result.getInt("event_type_id"),
+                    result.getInt("machine_id"),
+                    result.getDate("date_scheduled"),
+                )
+            )
+        }
+        return events
+    }
 }
 
 
@@ -81,7 +204,6 @@ fun getOrder(orderNumber: Int): Order {
                 Cust.CustomerServiceRep                        AS customer_rep,
                 Orders.id_EmpCreatedBy                         AS created_by_id,
                 Orders.id_OrderType                            AS order_type_id,
-                UPPER(Orders.HoldOrderText)                    AS on_hold_text,
             
                 -- Quantities
                 Orders.cn_TotalProductQty_ToProduce            AS product_quantity,
@@ -136,7 +258,7 @@ fun getOrder(orderNumber: Int): Order {
                 Orders.NotesToWebSalesperson                   AS notes_to_web_salesperson
             FROM Orders
                      JOIN Cust ON Cust.ID_Customer = Orders.id_Customer
-            WHERE Orders.ID_Order = ?           
+            WHERE Orders.ID_Order = ?
     """.trimIndent()
         val query = it.prepareStatement(queryText)
         query.setInt(1, orderNumber)
@@ -168,29 +290,32 @@ fun getOrder(orderNumber: Int): Order {
                 result.getDouble("status_paid"),
             ),
             Notes(
-                result.getString("notes_on_order") ?: "",
-                result.getString("notes_on_hold") ?: "",
-                result.getString("notes_on_art") ?: "",
-                result.getString("notes_on_purchasing") ?: "",
-                result.getString("notes_on_purchasing_sub") ?: "",
-                result.getString("notes_on_receiving") ?: "",
-                result.getString("notes_on_production") ?: "",
-                result.getString("notes_on_shipping") ?: "",
-                result.getString("notes_on_accounting") ?: "",
-                result.getString("notes_to_art") ?: "",
-                result.getString("notes_to_purchasing") ?: "",
-                result.getString("notes_to_purchasing_sub") ?: "",
-                result.getString("notes_to_receiving") ?: "",
-                result.getString("notes_to_production") ?: "",
-                result.getString("notes_to_finishing") ?: "",
-                result.getString("notes_to_shipping") ?: "",
-                result.getString("notes_to_accounting") ?: "",
-                result.getString("notes_forms_order_approval") ?: "",
-                result.getString("notes_forms_invoice") ?: "",
-                result.getString("notes_forms_packing_list") ?: "",
-                result.getString("notes_to_web_customer") ?: "",
-                result.getString("notes_to_web_salesperson") ?: "",
+                result.getString("notes_on_order"),
+                result.getString("notes_on_hold"),
+                result.getString("notes_on_art"),
+                result.getString("notes_on_purchasing"),
+                result.getString("notes_on_purchasing_sub"),
+                result.getString("notes_on_receiving"),
+                result.getString("notes_on_production"),
+                result.getString("notes_on_shipping"),
+                result.getString("notes_on_accounting"),
+                result.getString("notes_to_art"),
+                result.getString("notes_to_purchasing"),
+                result.getString("notes_to_purchasing_sub"),
+                result.getString("notes_to_receiving"),
+                result.getString("notes_to_production"),
+                result.getString("notes_to_finishing"),
+                result.getString("notes_to_shipping"),
+                result.getString("notes_to_accounting"),
+                result.getString("notes_forms_order_approval"),
+                result.getString("notes_forms_invoice"),
+                result.getString("notes_forms_packing_list"),
+                result.getString("notes_to_web_customer"),
+                result.getString("notes_to_web_salesperson"),
             ),
+            getOrderLineItems(orderNumber),
+            getOrderProductionLines(orderNumber),
+            getOrderEvents(orderNumber),
         )
     }
 }
