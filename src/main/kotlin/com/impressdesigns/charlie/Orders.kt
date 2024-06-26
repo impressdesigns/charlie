@@ -216,7 +216,7 @@ fun getOrder(orderNumber: Int): Order {
                 Orders.date_OrderDropDead                      AS date_in_hands,
             
                 -- Statuses
-                CASE Orders.sts_01 WHEN 10 THEN 1 ELSE 0 END   AS status_hold,
+                Orders.sts_01                                  AS status_hold,
                 Orders.sts_ArtDone                             AS status_art,
                 Orders.sts_Purchased                           AS status_purchased,
                 Orders.sts_PurchasedSub                        AS status_purchased_sub,
@@ -271,7 +271,7 @@ fun getOrder(orderNumber: Int): Order {
             result.getString("customer_rep") ?: "",
             result.getInt("created_by_id"),
             result.getDouble("order_type_id"),
-            result.getInt("status_hold") == 1,
+            result.getInt("status_hold") == 10,
             result.getInt("product_quantity"),
             result.getInt("decoration_quantity"),
             result.getDate("date_created"),
