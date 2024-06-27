@@ -7,7 +7,13 @@ import org.springframework.web.bind.annotation.RestController
 import java.sql.Date
 
 
-data class ProductionLine(val orderNumber: Int, val designNumber: Int, val quantity: Int, val instructions: String)
+data class DigitalProductionLine(
+    val orderNumber: Int,
+    val designNumber: Int,
+    val quantity: Int,
+    val instructions: String
+)
+
 data class Design(val designNumber: Float, val title: String)
 data class DesignNumber(val designNumber: Int)
 
@@ -26,7 +32,7 @@ class SearchController {
 }
 
 
-fun getOpenDigitalProductionLines(): List<ProductionLine> {
+fun getOpenDigitalProductionLines(): List<DigitalProductionLine> {
     connect().use {
         val queryText = """
             SELECT Orders.ID_Order             AS order_id,
@@ -42,13 +48,13 @@ fun getOpenDigitalProductionLines(): List<ProductionLine> {
     """.trimIndent()
         val query = it.prepareStatement(queryText)
         val result = query.executeQuery()
-        val lines = mutableListOf<ProductionLine>()
+        val lines = mutableListOf<DigitalProductionLine>()
         while (result.next()) {
             val orderId = result.getInt("order_id")
             val designId = result.getInt("design_id")
             val quantity = result.getInt("quantity")
             val instructions = result.getString("instructions")
-            lines.add(ProductionLine(orderId, designId, quantity, instructions))
+            lines.add(DigitalProductionLine(orderId, designId, quantity, instructions))
         }
         return lines
     }
