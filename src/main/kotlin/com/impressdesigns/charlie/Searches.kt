@@ -1,10 +1,10 @@
 package com.impressdesigns.charlie
 
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.sql.Date
+import kotlin.math.roundToInt
 
 
 data class DigitalProductionLine(
@@ -14,8 +14,9 @@ data class DigitalProductionLine(
     val instructions: String
 )
 
-data class Design(val designNumber: Float, val title: String)
-data class DesignNumber(val designNumber: Int)
+data class NumberList(
+    val numbers: List<Int>,
+)
 
 
 @RestController
@@ -24,11 +25,11 @@ class SearchController {
     @GetMapping("/open-digital-production-lines")
     fun openDigitalProductionLines() = getOpenDigitalProductionLines()
 
-    @GetMapping("/designs-updated-today")
-    fun designsUpdatedToday() = getDesignsUpdatedToday()
+    @GetMapping("/orders-to-update")
+    fun ordersToUpdate() = getOrdersToUpdate()
 
-    @GetMapping("/designs-on-po/{po}/")
-    fun designsOnPo(@PathVariable po: String) = getDesignsOnPo(po)
+    @GetMapping("/designs-to-update")
+    fun designsToUpdate() = getDesignsToUpdate()
 }
 
 
@@ -60,43 +61,39 @@ fun getOpenDigitalProductionLines(): List<DigitalProductionLine> {
     }
 }
 
-fun getDesignsUpdatedToday(): List<Design> {
+fun getOrdersToUpdate(): NumberList {
     connect().use {
         val queryText = """
-            SELECT 
-                ID_Design AS id,
-                DesignName AS title
+            SELECT ID_Order AS id
+            FROM Orders
+            WHERE Orders.date_Modification = ? OR Orders.sts_Invoiced = 0
+    """.trimIndent()
+        val query = it.prepareStatement(queryText)
+        query.setDate(1, Date(java.util.Date().time))
+        val result = query.executeQuery()
+        val numbers = mutableListOf<Int>()
+        while (result.next()) {
+            numbers.add(result.getFloat("id").roundToInt())
+        }
+        return NumberList(numbers)
+    }
+}
+
+
+fun getDesignsToUpdate(): NumberList {
+    connect().use {
+        val queryText = """
+            SELECT ID_Design AS id
             FROM Des
             WHERE Des.date_Modification = ?
     """.trimIndent()
         val query = it.prepareStatement(queryText)
         query.setDate(1, Date(java.util.Date().time))
         val result = query.executeQuery()
-        val designs = mutableListOf<Design>()
+        val numbers = mutableListOf<Int>()
         while (result.next()) {
-            val id = result.getFloat("id")
-            val title = result.getString("title") ?: ""
-            designs.add(Design(id, title))
+            numbers.add(result.getFloat("id").roundToInt())
         }
-        return designs
-    }
-}
-
-fun getDesignsOnPo(po: String): List<DesignNumber> {
-    connect().use {
-        val queryText = """
-            SELECT OrderDes.id_Design AS design_number
-            FROM OrderDes
-            JOIN Orders ON Orders.ID_Order = OrderDes.id_Order
-            WHERE Orders.CustomerPurchaseOrder = ?
-    """.trimIndent()
-        val query = it.prepareStatement(queryText)
-        query.setString(1, po)
-        val result = query.executeQuery()
-        val designs = mutableListOf<DesignNumber>()
-        while (result.next()) {
-            designs.add(DesignNumber(result.getInt("design_number")))
-        }
-        return designs
+        return NumberList(numbers)
     }
 }
