@@ -73,7 +73,7 @@ fun getOrdersToUpdate(): NumberList {
         val result = query.executeQuery()
         val numbers = mutableListOf<Int>()
         while (result.next()) {
-            numbers.add(result.getFloat("id").roundToInt())
+            numbers.add(result.getInt("id"))
         }
         return NumberList(numbers)
     }
