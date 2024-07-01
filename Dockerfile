@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk-alpine@sha256:ebfc28d35b192c55509e3c7cc597d91136528f1a9d3261965b44663af9eb4b4b as build
+FROM eclipse-temurin:21-jdk-alpine@sha256:68a8a4ad547e750f497824540d90ff29d4b819a6a6287a5eb1b03a71e4c2167b as build
 
 ARG git_sha="development"
 ENV GIT_SHA=$git_sha
@@ -12,7 +12,7 @@ COPY src src
 
 RUN ./gradlew bootJar
 
-FROM eclipse-temurin:21-jre-alpine@sha256:23467b3e42617ca197f43f58bc5fb03ca4cb059d68acd49c67128bfded132d67
+FROM eclipse-temurin:21-jre-alpine@sha256:f05c742dd20051b104b939370f7db4d6eb420cc7fd842aeb4e2446837da3bd03
 
 ARG git_sha="development"
 ENV GIT_SHA=$git_sha
