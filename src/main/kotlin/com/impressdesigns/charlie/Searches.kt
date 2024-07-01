@@ -21,10 +21,10 @@ data class DesignNumber(val designNumber: Int)
 @RestController
 @RequestMapping(path = ["search"])
 class SearchController {
-    @GetMapping("/open-digital-production-lines/")
+    @GetMapping("/open-digital-production-lines")
     fun openDigitalProductionLines() = getOpenDigitalProductionLines()
 
-    @GetMapping("/designs-updated-today/")
+    @GetMapping("/designs-updated-today")
     fun designsUpdatedToday() = getDesignsUpdatedToday()
 
     @GetMapping("/designs-on-po/{po}/")

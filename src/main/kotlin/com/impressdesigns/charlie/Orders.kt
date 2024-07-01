@@ -9,7 +9,7 @@ import java.sql.Date
 @RestController
 @RequestMapping(path = ["orders"])
 class OrdersController {
-    @GetMapping("/{orderNumber}/")
+    @GetMapping("/{orderNumber}")
     fun order(@PathVariable orderNumber: Int) = getOrder(orderNumber)
 }
 
