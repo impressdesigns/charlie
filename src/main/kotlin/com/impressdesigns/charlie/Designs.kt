@@ -38,7 +38,7 @@ fun getDesign(designNumber: Int): Design {
         }
         return Design(
             truncate(result.getFloat("id")).roundToInt(),
-            result.getString("title")
+            result.getString("title") ?: "",
         )
     }
 }
