@@ -27,7 +27,7 @@ data class ProductionLine(
     val designId: Int,
     val applyLocation: Boolean,
     val quantity: Int,
-    val designLocation: String,
+    val designLocation: String?,
 )
 
 
