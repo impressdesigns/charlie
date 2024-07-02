@@ -66,7 +66,8 @@ fun getOrdersToUpdate(): NumberList {
         val queryText = """
             SELECT ID_Order AS id
             FROM Orders
-            WHERE Orders.date_Modification = ? OR Orders.sts_Invoiced = 0
+            WHERE Orders.ID_Order > 300000 -- Arbitrary limit to reduce runtime and to avoid pulling in invalid data 
+              AND (Orders.date_Modification = ? OR Orders.sts_Invoiced = 0)
     """.trimIndent()
         val query = it.prepareStatement(queryText)
         query.setDate(1, Date(java.util.Date().time))
