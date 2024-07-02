@@ -189,6 +189,9 @@ fun getOrderLineItems(orderNumber: Int): List<LineItem> {
         val result = query.executeQuery()
         val lines = mutableListOf<LineItem>()
         while (result.next()) {
+            if (result.getString("part_number") == null) {
+                continue
+            }
             lines.add(
                 LineItem(
                     result.getInt("lines_oe_id"),
