@@ -1,13 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "3.2.5"
-    id("io.spring.dependency-management") version "1.1.4"
-    kotlin("jvm") version "1.9.23"
-    kotlin("plugin.spring") version "1.9.23"
+    id("org.springframework.boot") version "3.3.1"
+    id("io.spring.dependency-management") version "1.1.6"
+    kotlin("jvm") version "2.0.0"
+    kotlin("plugin.spring") version "2.0.0"
     id("org.jetbrains.dokka") version "1.9.20"
-    id("io.sentry.jvm.gradle") version "4.5.1"
-    id("org.jetbrains.kotlinx.kover") version "0.7.6"
+    id("io.sentry.jvm.gradle") version "4.10.0"
+    id("org.jetbrains.kotlinx.kover") version "0.8.2"
 }
 
 group = "com.impressdesigns"
@@ -28,7 +28,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.8.0")
+    implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.12.0")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
